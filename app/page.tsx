@@ -95,17 +95,17 @@ export default function Home() {
 
   const [downloads, setDownloads] = useState({
     appimage: {
-      url: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.AppImage",
-      filename: "TokenTracker_0.1.0_amd64.AppImage",
-      cmd: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.AppImage && chmod +x TokenTracker_0.1.0_amd64.AppImage && ./TokenTracker_0.1.0_amd64.AppImage",
+      url: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.1_amd64.AppImage",
+      filename: "TokenTracker_0.1.1_amd64.AppImage",
+      cmd: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.1_amd64.AppImage && chmod +x TokenTracker_0.1.1_amd64.AppImage && ./TokenTracker_0.1.1_amd64.AppImage",
     },
     deb: {
-      url: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.deb",
-      filename: "TokenTracker_0.1.0_amd64.deb",
-      cmd: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.deb && sudo dpkg -i TokenTracker_0.1.0_amd64.deb",
+      url: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.1_amd64.deb",
+      filename: "TokenTracker_0.1.1_amd64.deb",
+      cmd: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.1_amd64.deb && sudo dpkg -i TokenTracker_0.1.1_amd64.deb",
     },
-    msi: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_x64_en-US.msi",
-    exe: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_x64-setup.exe",
+    msi: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.1_x64_en-US.msi",
+    exe: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.1_x64-setup.exe",
   });
 
   useEffect(() => {
