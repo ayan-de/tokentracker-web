@@ -93,7 +93,7 @@ export default function Home() {
   const [selectedPreview, setSelectedPreview] = useState("claude");
 
   const linuxCommand =
-    "curl -LO https://github.com/ayan-de/codexbar-desktop/releases/latest/download/TokenTracker.AppImage && chmod +x TokenTracker.AppImage && ./TokenTracker.AppImage";
+    "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker.AppImage && chmod +x TokenTracker.AppImage && ./TokenTracker.AppImage";
 
   const handleCopy = async () => {
     try {
@@ -122,7 +122,7 @@ export default function Home() {
           <span className="font-bold tracking-tight text-sm">TokenTracker</span>
         </div>
         <a
-          href="https://github.com/ayan-de/codexbar-desktop"
+          href="https://github.com/ayan-de/Token-Tracker"
           className="text-xs text-zinc-400 hover:text-white transition-colors"
           target="_blank"
           rel="noopener noreferrer"
@@ -202,7 +202,7 @@ export default function Home() {
                 <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
                   <span>Standard deb package is also available under Releases.</span>
                   <a
-                    href="https://github.com/ayan-de/codexbar-desktop/releases/latest"
+                    href="https://github.com/ayan-de/Token-Tracker/releases/latest"
                     className="text-blue-400 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -221,14 +221,14 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <a
-                    href="https://github.com/ayan-de/codexbar-desktop/releases/latest/download/TokenTracker_x64_en-US.msi"
+                    href="https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_x64_en-US.msi"
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-zinc-950 hover:bg-white/5 transition-all text-center group cursor-pointer decoration-none"
                   >
                     <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">MSI Installer</span>
                     <span className="text-[10px] text-zinc-500 mt-1">Recommended (.msi)</span>
                   </a>
                   <a
-                    href="https://github.com/ayan-de/codexbar-desktop/releases/latest/download/TokenTracker.exe"
+                    href="https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker.exe"
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-zinc-950 hover:bg-white/5 transition-all text-center group cursor-pointer decoration-none"
                   >
                     <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">Portable App</span>
