@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const PROVIDER_PREVIEWS: Record<
   string,
@@ -93,18 +93,79 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [selectedPreview, setSelectedPreview] = useState("claude");
 
-  const linuxCommands = {
-    appimage:
-      "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker.AppImage && chmod +x TokenTracker.AppImage && ./TokenTracker.AppImage",
-    deb: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_amd64.deb && sudo dpkg -i TokenTracker_amd64.deb",
-  };
+  const [downloads, setDownloads] = useState({
+    appimage: {
+      url: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.AppImage",
+      filename: "TokenTracker_0.1.0_amd64.AppImage",
+      cmd: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.AppImage && chmod +x TokenTracker_0.1.0_amd64.AppImage && ./TokenTracker_0.1.0_amd64.AppImage",
+    },
+    deb: {
+      url: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.deb",
+      filename: "TokenTracker_0.1.0_amd64.deb",
+      cmd: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_amd64.deb && sudo dpkg -i TokenTracker_0.1.0_amd64.deb",
+    },
+    msi: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_x64_en-US.msi",
+    exe: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_0.1.0_x64-setup.exe",
+  });
 
-  const windowsDownloads = {
-    msi: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_x64_en-US.msi",
-    exe: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_x64-setup.exe",
-  };
+  useEffect(() => {
+    async function fetchLatestRelease() {
+      try {
+        const res = await fetch("https://api.github.com/repos/ayan-de/Token-Tracker/releases/latest");
+        if (!res.ok) throw new Error("Failed to fetch latest release");
+        const data = await res.json();
+        
+        let appImageUrl = "";
+        let appImageName = "";
+        let debUrl = "";
+        let debName = "";
+        let msiUrl = "";
+        let exeUrl = "";
 
-  const activeLinuxCommand = linuxCommands[linuxMethod];
+        if (data.assets && Array.isArray(data.assets)) {
+          for (const asset of data.assets) {
+            const name = asset.name;
+            const url = asset.browser_download_url;
+            if (name.endsWith(".AppImage")) {
+              appImageUrl = url;
+              appImageName = name;
+            } else if (name.endsWith(".deb")) {
+              debUrl = url;
+              debName = name;
+            } else if (name.endsWith(".msi")) {
+              msiUrl = url;
+            } else if (name.endsWith(".exe") || name.endsWith("-setup.exe")) {
+              exeUrl = url;
+            }
+          }
+        }
+
+        setDownloads((prev) => ({
+          appimage: {
+            url: appImageUrl || prev.appimage.url,
+            filename: appImageName || prev.appimage.filename,
+            cmd: appImageUrl 
+              ? `curl -LO ${appImageUrl} && chmod +x ${appImageName} && ./${appImageName}`
+              : prev.appimage.cmd,
+          },
+          deb: {
+            url: debUrl || prev.deb.url,
+            filename: debName || prev.deb.filename,
+            cmd: debUrl 
+              ? `curl -LO ${debUrl} && sudo dpkg -i ${debName}`
+              : prev.deb.cmd,
+          },
+          msi: msiUrl || prev.msi,
+          exe: exeUrl || prev.exe,
+        }));
+      } catch (err) {
+        console.error("Failed to load releases:", err);
+      }
+    }
+    fetchLatestRelease();
+  }, []);
+
+  const activeLinuxCommand = downloads[linuxMethod].cmd;
 
   const handleCopy = async () => {
     try {
@@ -213,7 +274,7 @@ export default function Home() {
                   <>
                     <div className="bg-zinc-950 border border-white/5 p-3 rounded-xl font-mono text-[10px] text-cyan-400 relative group overflow-hidden">
                       <span className="break-all text-left flex-1 pr-10 leading-normal">
-                        {linuxCommands.appimage}
+                        {downloads.appimage.cmd}
                       </span>
                       <button
                         onClick={handleCopy}
@@ -242,7 +303,7 @@ export default function Home() {
                   <>
                     <div className="bg-zinc-950 border border-white/5 p-3 rounded-xl font-mono text-[10px] text-cyan-400 relative group overflow-hidden">
                       <span className="break-all text-left flex-1 pr-10 leading-normal">
-                        {linuxCommands.deb}
+                        {downloads.deb.cmd}
                       </span>
                       <button
                         onClick={handleCopy}
@@ -285,14 +346,14 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <a
-                    href={windowsDownloads.msi}
+                    href={downloads.msi}
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-zinc-950 hover:bg-white/5 transition-all text-center group cursor-pointer decoration-none"
                   >
                     <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">MSI Installer</span>
                     <span className="text-[10px] text-zinc-500 mt-1">Recommended (.msi)</span>
                   </a>
                   <a
-                    href={windowsDownloads.exe}
+                    href={downloads.exe}
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-zinc-950 hover:bg-white/5 transition-all text-center group cursor-pointer decoration-none"
                   >
                     <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">EXE Installer</span>
