@@ -89,15 +89,26 @@ const PROVIDER_PREVIEWS: Record<
 
 export default function Home() {
   const [installOS, setInstallOS] = useState<"linux" | "windows">("linux");
+  const [linuxMethod, setLinuxMethod] = useState<"appimage" | "deb">("appimage");
   const [copied, setCopied] = useState(false);
   const [selectedPreview, setSelectedPreview] = useState("claude");
 
-  const linuxCommand =
-    "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker.AppImage && chmod +x TokenTracker.AppImage && ./TokenTracker.AppImage";
+  const linuxCommands = {
+    appimage:
+      "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker.AppImage && chmod +x TokenTracker.AppImage && ./TokenTracker.AppImage",
+    deb: "curl -LO https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_amd64.deb && sudo dpkg -i TokenTracker_amd64.deb",
+  };
+
+  const windowsDownloads = {
+    msi: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_x64_en-US.msi",
+    exe: "https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_x64-setup.exe",
+  };
+
+  const activeLinuxCommand = linuxCommands[linuxMethod];
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(linuxCommand);
+      await navigator.clipboard.writeText(activeLinuxCommand);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -137,7 +148,7 @@ export default function Home() {
         <section className="lg:col-span-7 space-y-8 flex flex-col justify-center text-center lg:text-left">
           <div className="space-y-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-blue-500/10 text-cyan-400 border border-blue-500/25 uppercase">
-              Now Available on Linux & Windows
+              Now Available on Linux, Arch & Windows
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent">
               Track Your AI Spend Directly From Your Desktop
@@ -177,39 +188,92 @@ export default function Home() {
             {installOS === "linux" && (
               <div className="space-y-4">
                 <p className="text-xs text-zinc-400 text-left">
-                  Run the following command to download, authorize, and run the standalone **AppImage** binary:
+                  Choose your distribution to download and run TokenTracker:
                 </p>
-                <div className="flex items-center gap-2 bg-zinc-950 border border-white/5 p-3 rounded-xl font-mono text-[10px] text-cyan-400 relative group overflow-hidden">
-                  <span className="break-all text-left flex-1 pr-10 leading-normal">
-                    {linuxCommand}
-                  </span>
-                  <button
-                    onClick={handleCopy}
-                    className="absolute right-2 top-2 p-1.5 rounded-md bg-white/5 hover:bg-white/15 text-zinc-300 transition-colors border-0 outline-none cursor-pointer"
-                    title="Copy to clipboard"
-                  >
-                    {copied ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6m-6-4h6" />
-                      </svg>
-                    )}
-                  </button>
+
+                {/* Method selector */}
+                <div className="flex gap-2">
+                  {(["appimage", "deb"] as const).map((m) => (
+                    <button
+                      key={m}
+                      onClick={() => setLinuxMethod(m)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                        linuxMethod === m
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10"
+                      }`}
+                    >
+                      {m === "appimage" ? "AppImage" : "Debian"}
+                    </button>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
-                  <span>Standard deb package is also available under Releases.</span>
-                  <a
-                    href="https://github.com/ayan-de/Token-Tracker/releases/latest"
-                    className="text-blue-400 hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    All Downloads &rarr;
-                  </a>
-                </div>
+
+                {/* AppImage install */}
+                {linuxMethod === "appimage" && (
+                  <>
+                    <div className="bg-zinc-950 border border-white/5 p-3 rounded-xl font-mono text-[10px] text-cyan-400 relative group overflow-hidden">
+                      <span className="break-all text-left flex-1 pr-10 leading-normal">
+                        {linuxCommands.appimage}
+                      </span>
+                      <button
+                        onClick={handleCopy}
+                        className="absolute right-2 top-2 p-1.5 rounded-md bg-white/5 hover:bg-white/15 text-zinc-300 transition-colors border-0 outline-none cursor-pointer"
+                        title="Copy to clipboard"
+                      >
+                        {copied ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6m-6-4h6" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-zinc-500 text-left">
+                      AppImage works on all Linux distros (Ubuntu, Debian, Fedora, Arch, and more). Make executable and run directly.
+                    </p>
+                  </>
+                )}
+
+                {/* Debian install */}
+                {linuxMethod === "deb" && (
+                  <>
+                    <div className="bg-zinc-950 border border-white/5 p-3 rounded-xl font-mono text-[10px] text-cyan-400 relative group overflow-hidden">
+                      <span className="break-all text-left flex-1 pr-10 leading-normal">
+                        {linuxCommands.deb}
+                      </span>
+                      <button
+                        onClick={handleCopy}
+                        className="absolute right-2 top-2 p-1.5 rounded-md bg-white/5 hover:bg-white/15 text-zinc-300 transition-colors border-0 outline-none cursor-pointer"
+                        title="Copy to clipboard"
+                      >
+                        {copied ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6m-6-4h6" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-zinc-500 text-left">
+                      For Ubuntu, Debian, and derivatives. Installs system-wide via dpkg.
+                    </p>
+                  </>
+                )}
+
+                <a
+                  href="https://github.com/ayan-de/Token-Tracker/releases/latest"
+                  className="text-blue-400 hover:underline text-[11px]"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  All Downloads (RPM, source) &rarr;
+                </a>
               </div>
             )}
 
@@ -221,22 +285,22 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <a
-                    href="https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker_x64_en-US.msi"
+                    href={windowsDownloads.msi}
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-zinc-950 hover:bg-white/5 transition-all text-center group cursor-pointer decoration-none"
                   >
                     <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">MSI Installer</span>
                     <span className="text-[10px] text-zinc-500 mt-1">Recommended (.msi)</span>
                   </a>
                   <a
-                    href="https://github.com/ayan-de/Token-Tracker/releases/latest/download/TokenTracker.exe"
+                    href={windowsDownloads.exe}
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-zinc-950 hover:bg-white/5 transition-all text-center group cursor-pointer decoration-none"
                   >
-                    <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">Portable App</span>
-                    <span className="text-[10px] text-zinc-500 mt-1">Standalone binary (.exe)</span>
+                    <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">EXE Installer</span>
+                    <span className="text-[10px] text-zinc-500 mt-1">Standard installer (.exe)</span>
                   </a>
                 </div>
                 <p className="text-[10px] text-zinc-500 text-left pt-1 leading-normal">
-                  *Requires the CodexBar CLI binary to be configured inside your system `%PATH%` environment variables.
+                  *Requires the CodexBar CLI binary to be configured inside your system <code className="font-mono text-zinc-300">%PATH%</code> environment variables.
                 </p>
               </div>
             )}
